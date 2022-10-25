@@ -1,6 +1,6 @@
 # Jarkom-Modul-2-B04-2022
 
-### Praktikum Jaringan Komputer Modul 2 - DNS dan Web Server
+## Praktikum Jaringan Komputer Modul 2 - DNS dan Web Server
 NRP | Nama
 -----------|---------------------------
 5025201025 | Dawamul Fikri Aqil
@@ -8,11 +8,11 @@ NRP | Nama
 5025201165 | Gabriel Solomon Sitanggang
 ---------------------------------------
 
-### Soal Shift Modul 2
+## Soal Shift Modul 2
 Link : https://docs.google.com/document/d/11Mz2Fd3DKtGkCknHee9VZRdJYvZ3YAMIaifObHEpBFo/edit
 
 
-### Penjelasan :
+## Penjelasan :
 ### Soal 1
 
 
