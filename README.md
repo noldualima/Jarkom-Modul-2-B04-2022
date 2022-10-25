@@ -27,7 +27,16 @@ Semua node terhubung pada router Ostania, sehingga dapat mengakses internet
 
 
 ### Soal 2
+Untuk mempermudah mendapatkan informasi mengenai misi dari Handler, bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise
 
+![namedconflocal](https://user-images.githubusercontent.com/91501217/197779905-f3c662b4-22ed-4c82-ace3-ff85a3800efb.png)
+Penjelasan Bantuin bikin penjelasan sat
+
+![folderwise](https://user-images.githubusercontent.com/91501217/197780266-e3abdfe8-cb77-4eea-a235-0454f5e9c307.png)
+Penjelasan Bantuin bikin penjelasan 
+
+![testcname](https://user-images.githubusercontent.com/91501217/197782993-6598ee64-8805-4f1b-a5d2-a11f4404e0b4.png)
+Lalu menggunakan host -t CNAME www.wise.b04.com akan muncul seperti gambar berikut
 
 ### Soal 3
 
