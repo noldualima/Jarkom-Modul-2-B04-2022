@@ -30,7 +30,7 @@ Semua node terhubung pada router Ostania, sehingga dapat mengakses internet
 Untuk mempermudah mendapatkan informasi mengenai misi dari Handler, bantulah Loid membuat website utama dengan akses wise.yyy.com dengan alias www.wise.yyy.com pada folder wise
 
 ![namedconflocal](https://user-images.githubusercontent.com/91501217/197779905-f3c662b4-22ed-4c82-ace3-ff85a3800efb.png)
-Penjelasan Bantuin bikin penjelasan sat
+setelah menginstall bind9, lalu buka file named.conf.local lalu isi seperti gambar yang diatas
 
 ![folderwise](https://user-images.githubusercontent.com/91501217/197780266-e3abdfe8-cb77-4eea-a235-0454f5e9c307.png)
 Penjelasan Bantuin bikin penjelasan 
