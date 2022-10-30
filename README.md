@@ -42,9 +42,53 @@ Penjelasan Bantuin bikin penjelasan
 Lalu menggunakan host -t CNAME www.wise.b04.com akan muncul seperti gambar berikut
 
 ### Soal 3
+Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.eden.wise.yyy.com yang diatur DNS-nya di WISE dan mengarah ke Eden
 
+#### Jawab
+Pada node wise lakukan perintah sebagai berikut :
+- edit file `wise.b04.com` pada folder `/etc/bind/wise` dengan cara :
+```
+nano /etc/bind/wise/wise.b07.com
+```
+- tambahkan konfigurasi subdomain pada file `wise.b04.com`, sehingga menjadi seperti berikut
+```
+$TTL    604800
+@       IN      SOA     wise.b04.com. root.wise.b04.com. (
+                                2       ; Serial
+                        604800          ; Refresh
+                        86400           ; Retry
+                        2419200         ; Expire
+                        604800 )        ; Negative Cache TTL
+;
+@               IN      NS      wise.b04.com.
+@               IN      A       10.5.3.3 ; IP Eden
+www             IN      CNAME   wise.b04.com.
+eden           IN      A       10.5.3.3 ; IP Eden
+www.eden       IN      CNAME   eden.wise.b04.com.
+ns1             IN      A       10.5.3.2; IP Berlint
+operation           IN      NS      ns1
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+  atau restart dengan perintah berikut:
+```
+named -g
+```
+- untuk mencoba koneksi subdomain, lakukan ping pada domain yang sudah dibuat dengan:
+```
+ping eden.wise.b04.com
+```
+- client berhasil terkoneksi dengan sub domain jika response ping seperti tampilan berikut:
+[3 1](https://user-images.githubusercontent.com/72547769/198888967-b020bda5-3946-47c5-a05d-eaadd8d5c16f.png)
+![3 2](https://user-images.githubusercontent.com/72547769/198888981-cbcd33b1-10c1-4cd6-9279-5faac472b3e7.png)
 
-### Soal 4
+### Soal 4!
+Buat juga reverse domain untuk domain utama
+
+#### Jawab
+Pada node wise lakukan perintah sebagai berikut :
 
 
 ### Soal 5
