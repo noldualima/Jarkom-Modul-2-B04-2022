@@ -484,7 +484,7 @@ service apache2 restart
 ```
 untuk mengecek konfigurasi. pada node Client (SSS dan Garden) lakukan perintah sebagai berikut :
 ```
-lynx www.wise.b07.com/index.php/home
+lynx www.wise.b04.com/index.php/home
 ```
 konfigurasi dapat dikatakan benar jika keluaran sebagai berikut
 ![9 1](https://user-images.githubusercontent.com/72547769/198892723-6f4ddf55-e9d0-46c0-a51c-607788a1a4da.png)
@@ -555,7 +555,7 @@ pada eden buat config baru dengan `nano /etc/apache2/sites-available/strix.opera
 kemudian aktifkan dengan `a2ensite strix.operation.wise.b04.com` kemudian edit juga pada `/etc/apache2/ports.conf` seperti berikut
 ![14 2](https://user-images.githubusercontent.com/72547769/198893367-93b5ecb7-f781-4ff2-90ee-1b7e11523c90.png)
 
-Kemudian tes dengan `lynx strix.operation.wise.b07.com:15000`
+Kemudian tes dengan `lynx strix.operation.wise.b04.com:15000`
 ![14 2 5](https://user-images.githubusercontent.com/72547769/198893948-1a028673-ed95-4cde-86b5-7a33d1326e98.png)
 
 ![14 3](https://user-images.githubusercontent.com/72547769/198893690-d46ed532-04cb-4c02-881c-10aebc871c09.png)
@@ -611,7 +611,7 @@ RewriteRule /.* http://eden.wise.b04.com/public/images/eden.png [L]
 ```
 lalu ganti config pada 
 ```
-/etc/apache2/sites-available/eden.wise.b07.com.conf
+/etc/apache2/sites-available/eden.wise.b04.com.conf
 ```
 dengan menambah `AllowOverride All` lalu jangan lupa `a2enmod rewrite` dan juga jangan lupa `restart apache`
 ```
@@ -624,7 +624,7 @@ dengan menambah `AllowOverride All` lalu jangan lupa `a2enmod rewrite` dan juga 
 
 kemudian cek dengan
 ```
-lynx www.eden.wise.b07.com/asedenash
+lynx www.eden.wise.b04.com/asedenash
 ```
 ![17 2](https://user-images.githubusercontent.com/72547769/198894866-f4eb3db5-0c7a-4b2f-a8cc-76757ca09649.png)
 
