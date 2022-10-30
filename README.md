@@ -72,7 +72,7 @@ operation           IN      NS      ns1
 ```
 service bind9 restart
 ```
-  atau restart dengan perintah berikut:
+   atau restart dengan perintah berikut:
 ```
 named -g
 ```
@@ -81,10 +81,10 @@ named -g
 ping eden.wise.b04.com
 ```
 - client berhasil terkoneksi dengan sub domain jika response ping seperti tampilan berikut:
-[3 1](https://user-images.githubusercontent.com/72547769/198888967-b020bda5-3946-47c5-a05d-eaadd8d5c16f.png)
+![3 1](https://user-images.githubusercontent.com/72547769/198888967-b020bda5-3946-47c5-a05d-eaadd8d5c16f.png)
 ![3 2](https://user-images.githubusercontent.com/72547769/198888981-cbcd33b1-10c1-4cd6-9279-5faac472b3e7.png)
 
-### Soal 4!
+### Soal 4
 Buat juga reverse domain untuk domain utama
 
 #### Jawab
