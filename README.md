@@ -54,34 +54,363 @@ Lalu menggunakan host -t CNAME www.wise.b04.com akan muncul seperti gambar berik
 
 
 ### Soal 8
+```
+apt-get install apache2 -y
+service apache2 start
+apt-get install php -y
+apt-get install libapache2-mod-php7.0 -y
+service apache2 
+apt-get install ca-certificates openssl -y
+apt-get install unzip -y
+apt-get install git -y
+git clone https://github.com/51Shades/Praktikum-Modul-2-Jarkom.git
+unzip -o /root/Praktikum-Modul-2-Jarkom/\*.zip -d /root/Praktikum-Modul-2-Jarkom
+echo "
+<VirtualHost *:80>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/wise.b04.com
+        ServerName wise.b04.com
+        ServerAlias www.wise.b04.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+" > /etc/apache2/sites-available/wise.b04.com.conf
+a2ensite wise.b04.com
+mkdir /var/www/wise.b04.com
+cp -r /root/Praktikum-Modul-2-Jarkom/wise/. /var/www/wise.b04.com
+service apache2 restart
+```
 
 ### Soal 9
+```
+a2enmod rewrite
+service apache2 restart
+echo "
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) /index.php/\$1 [L]
+" >/var/www/wise.b04.com/.htaccess
+echo "
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/wise.b04.com
+        ServerName wise.b04.com
+        ServerAlias www.wise.b04.com
 
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/wise.b04.com.conf
+service apache2 restart
+```
 
 ### Soal 10
+```
+echo "
+<VirtualHost *:80>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.b04.com
+        ServerName eden.wise.b04.com
+        ServerAlias www.eden.wise.b04.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.b04.com.conf
+a2ensite eden.wise.b04.com
+mkdir /var/www/eden.wise.b04.com
+cp -r /root/Praktikum-Modul-2-Jarkom/eden.wise/. /var/www/eden.wise.b04.com
+service apache2 restart
+echo "<?php echo 'yes nomor 10' ?>" > /var/www/eden.wise.b04.com/index.php
+```
 
 ### Soal 11
+```
+echo "
+<VirtualHost *:80>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.b04.com
+        ServerName eden.wise.b04.com
+        ServerAlias www.eden.wise.b04.com
+
+        <Directory /var/www/eden.wise.b04.com/public>
+                Options +Indexes
+        </Directory>
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.b04.com.conf
+service apache2 restart
+```
 
 ### Soal 12
+```
+echo "
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.b04.com
+        ServerName eden.wise.b04.com
+        ServerAlias www.eden.wise.b04.com
 
+        ErrorDocument 404 /error/404.html
+        ErrorDocument 500 /error/404.html
+        ErrorDocument 502 /error/404.html
+        ErrorDocument 503 /error/404.html
+        ErrorDocument 504 /error/404.html
+
+        <Directory /var/www/eden.wise.b04.com/public>
+                Options +Indexes
+        </Directory>
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.b04.com.conf
+service apache2 restart
+```
 
 ### Soal 13
+```
+echo "
+<VirtualHost *:80>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.b04.com
+        ServerName eden.wise.b04.com
+        ServerAlias www.eden.wise.b04.com
+
+        ErrorDocument 404 /error/404.html
+        ErrorDocument 500 /error/404.html
+        ErrorDocument 502 /error/404.html
+        ErrorDocument 503 /error/404.html
+        ErrorDocument 504 /error/404.html
+
+        <Directory /var/www/eden.wise.b04.com/public>
+                Options +Indexes
+        </Directory>
+
+        Alias \"/js\" \"/var/www/eden.wise.b04.com/public/js\"
+
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.b04.com.conf
+service apache2 restart
+```
 
 ### Soal 14
+```
+echo "
+<VirtualHost *:15000>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.b04.com
+        ServerName strix.operation.wise.b04.com
+        ServerAlias www.strix.operation.wise.b04.com
+
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+<VirtualHost *:15500>        
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.b04.com
+        ServerName strix.operation.wise.b04.com
+        ServerAlias www.strix.operation.wise.b04.com
+        
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+" > /etc/apache2/sites-available/strix.operation.wise.b04.com.conf
+a2ensite strix.operation.wise.b04.com
+service apache2 restart
+mkdir /var/www/strix.operation.wise.b04.com
+cp -r /root/Praktikum-Modul-2-Jarkom/strix.operation.wise/ ./var/www/strix.operation.wise.b04.com/
+echo "
+<?php
+        echo 'selamat 14';
+?>
+" > /var/www/strix.operation.wise.b04.com/index.php
+echo "
+# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+Listen 80
+Listen 15000
+Listen 15500
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+" > /etc/apache2/ports.conf
+
+service apache2 restart
+```
 
 ### Soal 15
+```
+htpasswd -c -b /etc/apache2/.htpasswd Twilight opStrix
 
+echo "
+<VirtualHost *:15000>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.b04.com
+        ServerName strix.operation.wise.b04.com
+        ServerAlias www.strix.operation.wise.b04.com
+
+        <Directory \"/var/www/strix.operation.wise.b04.com\">
+                AuthType Basic
+                AuthName \"Restricted Content\"
+                AuthUserFile /etc/apache2/.htpasswd
+                Require valid-user
+        </Directory>
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+<VirtualHost *:15500>        
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.b04.com
+        ServerName strix.operation.wise.b04.com
+        ServerAlias www.strix.operation.wise.b04.com
+        
+        <Directory \"/var/www/strix.operation.wise.b04.com\">
+                AuthType Basic
+                AuthName \"Restricted Content\"
+                AuthUserFile /etc/apache2/.htpasswd
+                Require valid-user
+        </Directory>
+        
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+" > /etc/apache2/sites-available/strix.operation.wise.b04.com.conf
+service apache2 restart
+```
 
 ### Soal 16
+```
+echo "
+<VirtualHost *:80>
 
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/html
+
+        RewriteEngine On
+        RewriteCond %{HTTP_HOST} !^wise.b04.com$
+        RewriteRule /.* http://wise.b04.com/ [R]
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+" > /etc/apache2/sites-available/000-default.conf
+service apache2 restart
+```
 
 ### Soal 17
+```
+echo "
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !/public/images/eden.png
+RewriteRule /.* http://eden.wise.b04.com/public/images/eden.png [L]
+" > /var/www/eden.wise.b04.com/.htaccess
 
+echo "
+<VirtualHost *:80>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.b04.com
+        ServerName eden.wise.b04.com
+        ServerAlias www.eden.wise.b04.com
+
+        ErrorDocument 404 /error/404.html
+        ErrorDocument 500 /error/404.html
+        ErrorDocument 502 /error/404.html
+        ErrorDocument 503 /error/404.html
+        ErrorDocument 504 /error/404.html
+
+        <Directory /var/www/eden.wise.b04.com/public>
+                Options +Indexes
+        </Directory>
+
+        Alias \"/js\" \"/var/www/eden.wise.b04.com/public/js\"
+
+        <Directory /var/www/eden.wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.b04.com.conf
+service apache2 restart
+
+}
+
+if [ $HOSTNAME == "Ostania" ]
+then
+    Ostania
+elif [ $HOSTNAME == "WISE" ]
+then
+    Wise
+elif [ $HOSTNAME == "Berlint" ]
+then
+    Berlint
+elif [ $HOSTNAME == "SSS" ]
+then
+    SSS
+elif [ $HOSTNAME == "Garden" ]
+then
+    Garden
+elif [ $HOSTNAME == "Eden" ]
+then
+    Eden
+fi
+```
 
 ## Kendala
 
