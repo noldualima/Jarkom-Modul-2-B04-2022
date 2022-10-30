@@ -20,6 +20,48 @@ WISE akan dijadikan sebagai DNS Master, Berlint akan dijadikan DNS Slave, dan Ed
 
 ## Penjelasan :
 ### Soal 1
+Pembuatan topologi seperti file yang sudah dilampirkan dan menggunakan konfigurasi pada tiap nodenya seperti berikut:
+(DNS Master) Wise
+network configuration
+```
+auto eth0
+iface eth0 inet static
+	address 10.5.1.2
+  netmask 255.255.255.0
+	gateway 10.5.1.1
+```
+(DNS Slave) Berlint
+```
+auto eth0
+iface eth0 inet static
+	address 10.5.3.2
+	netmask 255.255.255.0
+	gateway 10.5.3.1
+```
+(Web Server) Eden
+```
+auto eth0
+iface eth0 inet static
+	address 10.5.3.3
+	netmask 255.255.255.0
+	gateway 10.5.3.1
+```
+(Client) SSS
+```
+auto eth0
+iface eth0 inet static
+	address 10.5.2.2
+	netmask 255.255.255.0
+	gateway 10.5.2.1
+```
+(Client) Garden
+```
+auto eth0
+iface eth0 inet static
+	address 10.5.2.3
+	netmask 255.255.255.0
+	gateway 10.5.2.1
+```
 Semua node terhubung pada router Ostania, sehingga dapat mengakses internet
 
 ![ping1](https://user-images.githubusercontent.com/91501217/197776672-93545b2f-9612-465d-b9ca-43c5f834b0df.png)
@@ -48,7 +90,7 @@ Setelah itu ia juga ingin membuat subdomain eden.wise.yyy.com dengan alias www.e
 Pada node wise lakukan perintah sebagai berikut :
 - edit file `wise.b04.com` pada folder `/etc/bind/wise` dengan cara :
 ```
-nano /etc/bind/wise/wise.b07.com
+nano /etc/bind/wise/wise.b04.com
 ```
 - tambahkan konfigurasi subdomain pada file `wise.b04.com`, sehingga menjadi seperti berikut
 ```
@@ -89,162 +131,376 @@ Buat juga reverse domain untuk domain utama
 
 #### Jawab
 Pada node wise lakukan perintah sebagai berikut :
+- edit file `named.conf.local` pada folder `/etc/bind/` dengan cara:
+```
+nano /etc/bind/named.conf.local
+```
+- tambahkan konfigurasi reserve domain sehingga pada file `named.conf.local`, sehingga seperti berikut
+```
+zone "wise.b04.com" {
+        type master;
+        //notify yes;
+        //also-notify {10.5.3.2;};  Masukan IP Berlint tanpa tanda petik
+        file "/etc/bind/wise/wise.b04.com";
+        allow-transfer {10.5.3.2;}; // Masukan IP Berlint tanpa tanda petik
+};
 
+zone "2.5.10.in-addr.arpa" {
+        type master;
+        file "/etc/bind/wise/2.5.10.in-addr.arpa";
+};
+```
+- Copykan file db.local pada path /etc/bind ke dalam folder wise yang baru saja dibuat dan ubah namanya menjadi 2.5.10.in-addr.arpa
+- edit file `2.5.10.in-addr.arpa` dengan menggunakan perintah:
+```
+nano /etc/bind/wise/2.5.10.in-addr.arpa
+```
+- Sesuaikan konfigurasi sehingga menjadi seperti berikut :
+```
+$TTL    604800
+@       IN      SOA     wise.b04.com. root.wise.b04.com. (
+                                2       ; Serial
+                        604800          ; Refresh
+                        86400           ; Retry
+                        2419200         ; Expire
+                        604800 )        ; Negative Cache TTL
+;
+2.5.10.in-addr.arpa.   IN      NS      wise.b04.com.
+2                       IN      PTR     wise.b04.com.
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+   atau restart dengan perintah berikut:
+```
+named -g
+```
+- untuk mencoba konfigurasi, lakukan install `dnsutils` pastikan name server merupakan IP dari ostania dengan:
+```
+apt-get update
+apt-get install dnsutils
+```
+- kembalikan nameserver pada `/etc/resolv.conf` dengan IP wise, dan lakukan :
+```
+host -t PTR "10.5.2.2"
+```
+- konfigurasi berhasil jika ada tampilan sebagai berikut:
+![4 1](https://user-images.githubusercontent.com/72547769/198890360-aa6c1948-8018-4cb6-a140-88610fd7670e.png)
 
 ### Soal 5
+Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama
+#### Jawab
+Pada node wise lakukan perintah sebagai berikut:
+- edit `named.conf.local` pada folder `/etc/bind/` dengan cara :
+```
+nano /etc/bind/named.conf.local
+```
+- tambahkan konfigurasi reserve domain sehingga pada file `named.conf.local` sehingga terlihat sebagai berikut:
+```
+zone "wise.b04.com" {
+        type master;
+        //notify yes;
+        //also-notify {10.5.3.2;};  Masukan IP Berlint tanpa tanda petik
+        file "/etc/bind/wise/wise.b04.com";
+        allow-transfer {10.5.3.2;}; // Masukan IP Berlint tanpa tanda petik
+};
 
+zone "2.5.10.in-addr.arpa" {
+        type master;
+        file "/etc/bind/wise/2.5.10.in-addr.arpa";
+};
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+   atau restart dengan perintah berikut:
+```
+named -g
+```
+Pada node Berlint lakukan perintah sebagai berikut :
+- terlebih dahulu lakukan update package lists dengan menjalankan command:
+```
+apt-get update
+```
+- lakukan update silahkan install aplikasi bind9 pada Berlint dengan perintah:
+```
+apt-get install bind9 -y
+```
+- edit file /etc/bind/named.conf.local dengan menggunakan :
+```
+nano /etc/bind/named.conf.local
+```
+- tambahkan syntax berikut:
+```
+zone "operation.wise.b04.com"{
+        type master;
+        file "/etc/bind/operation/operation.wise.b04.com";
+};
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+   atau restart dengan perintah berikut:
+```
+named -g
+```
+Proses testing dapat dilakukan dengan mematikan server bind9 pada wise dengan sytax :
+```
+service bind9 stop
+```
+pada client (SSS dan Garden) lakukan hal berikut :
+- edit file seolv.conf dan tambahkan `IP berlint` Sehingga terlihat seperti berikut :
+```
+nameserver 10.5.1.2 #ip Wise
+nameserver 10.5.3.2 #ip Berlint
+```
+- client berhasil terkoneksi jika response ping seperti tampilan berikut :
+![5 2](https://user-images.githubusercontent.com/72547769/198891960-9c9b856b-f247-4f2e-bb10-08ea147339c5.png)
 
 ### Soal 6
+Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation
 
+#### Jawab
+
+Pada node Wise lakukan perintah sebagai berikut :
+
+- edit file /etc/bind/wise/wise.b04.com dengan menggunakan :
+```
+nano /etc/bind/wise/wise.b04.com
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
+ns1                 IN      A       10.5.3.2; IP Berlint
+operation           IN      NS      ns1
+```
+- edit file /etc/bind/named.conf.options dengan menggunakan :
+```
+nano /etc/bind/named.conf.options
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
+options {
+        directory "/var/cache/bind";
+
+        allow-query{any;};
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+```
+Pada node Berlint lakukan perintah sebagai berikut :
+
+- edit file /etc/bind/operation/operation.wise.b04.com dengan menggunakan :
+```
+nano /etc/bind/operation/operation.wise.b04.com
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
+$TTL    604800
+@       IN      SOA     operation.wise.b04.com. root.operation.wise.b04.com. (
+                                2      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@               IN      NS      operation.wise.b04.com.
+@               IN      A       10.5.3.3       ;ip Eden
+www             IN      CNAME   operation.wise.b04.com.
+strix           IN      A       10.5.3.3       ;IP Eden
+www.strix       IN      CNAME   strix.operation.wise.b04.com.
+```
+- edit file /etc/bind/named.conf.options dengan menggunakan :
+```
+nano /etc/bind/named.conf.options
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
+options {
+        directory "/var/cache/bind";
+        allow-query{any;};
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+   atau restart dengan perintah berikut:
+```
+named -g
+```
+untuk mengetahui apakah konfigurasi sudah benar, Pada node Client (SSS dan Garden) lakukan ping dengan sytax:
+```
+operation.wise.b04.com
+```
+konfigurasi dikatakan benar jika hasil ping sebagai berikut:
+![6 1](https://user-images.githubusercontent.com/72547769/198891998-ba143968-fec9-4b05-af5f-17bc06f40408.png)
 
 ### Soal 7
+Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden
+
+#### Jawab
+
+Pada node Berlint lakukan perintah sebagai berikut :
+
+- edit file /etc/bind/operation/operation.wise.b04.com dengan menggunakan :
+```
+nano /etc/bind/operation/operation.wise.b04.com
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
+$TTL    604800
+@       IN      SOA     operation.wise.b04.com. root.operation.wise.b04.com. (
+                                2      ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                        604800 )       ; Negative Cache TTL
+;
+@               IN      NS      operation.wise.b04.com.
+@               IN      A       10.5.3.3       ;ip Eden
+www             IN      CNAME   operation.wise.b04.com.
+strix           IN      A       10.5.3.3       ;IP Eden
+www.strix       IN      CNAME   strix.operation.wise.b04.com.
+```
+- lakukan restart server **bind9** dengan syntax berikut:
+```
+service bind9 restart
+```
+   atau restart dengan perintah berikut:
+```
+named -g
+```
+untuk mengetahui apakah konfigurasi sudah benar, Pada node Client (SSS dan Garden) lakukan ping dengan sytax:
+```
+strix.operation.wise.b04.com
+```
+konfigurasi dikatakan benar jika hasil ping sebagai berikut :
+![7 1](https://user-images.githubusercontent.com/72547769/198892138-a0f39ead-3d6e-42eb-b904-010d07bae775.png)
 
 
 ### Soal 8
+Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com
+
+### Jawab
+
+Pada node eden lakukan perintah sebagai berikut :
+- lakukan instalasi apache2 dengan menggunakan syntax berikut:
 ```
 apt-get install apache2 -y
-service apache2 start
+```
+- lakukan instalasi php dengan menggunakan syntax berikut:
+```
 apt-get install php -y
-apt-get install libapache2-mod-php7.0 -y
-service apache2 
-apt-get install ca-certificates openssl -y
-apt-get install unzip -y
-apt-get install git -y
-git clone https://github.com/51Shades/Praktikum-Modul-2-Jarkom.git
-unzip -o /root/Praktikum-Modul-2-Jarkom/\*.zip -d /root/Praktikum-Modul-2-Jarkom
-echo "
+apt-get install libapache2-mod-php7.0
+```
+- aktifkan service apache2 dengan menggunakan syntax berikut
+```
+service apache2 start
+```
+edit file /etc/apache2/sites-available/wise.b04.com.conf dengan menggunakan perintah
+```
+nano /etc/apache2/sites-available/wise.b04.com.conf
+```
+sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
 <VirtualHost *:80>
-
         ServerAdmin webmaster@localhost
         DocumentRoot /var/www/wise.b04.com
         ServerName wise.b04.com
         ServerAlias www.wise.b04.com
 
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
 </VirtualHost>
-" > /etc/apache2/sites-available/wise.b04.com.conf
-a2ensite wise.b04.com
-mkdir /var/www/wise.b04.com
-cp -r /root/Praktikum-Modul-2-Jarkom/wise/. /var/www/wise.b04.com
-service apache2 restart
 ```
+untuk mengecek konfigurasi webserver sudah tepat dapat melakukan hal berikut pada node Client (SSS dan Garden) :
+
+- lakukan instalasi dnsutils dengan menggunakan sytax berikut :
+```
+apt-get install dnsutils -y
+```
+- lakukan instalasi lynx dengan menggunakan
+```
+apt-get install lynx -y
+```
+- cek koneksi dengan menggunakan perintah
+```
+lynx  www.wise.b04.com
+```
+- konfigurasi dapat dikatakan benar jika keluaran sebagai berikut:
+![8 1](https://user-images.githubusercontent.com/72547769/198892533-214c4917-4f6e-422c-97dd-42d8607febc5.png)
 
 ### Soal 9
+Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home
+
+### Jawab
+Pada node eden lakukan perintah sebagai berikut :
+- edit file /etc/apache2/sites-available/wise.b04.com.conf dengan menggunakan perintah
 ```
-a2enmod rewrite
-service apache2 restart
-echo "
+nano /var/www/wise.b04.com/.htaccess
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut
+```
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule (.*) /index.php/\$1 [L]
-" >/var/www/wise.b04.com/.htaccess
-echo "
+RewriteRule (.*) /index.php/$1 [L]
+```
+- edit file /etc/apache2/sites-available/wise.b04.com.conf dengan menggunakan perintah
+```
+nano /etc/apache2/sites-available/wise.b04.com.conf
+```
+- sesuaikan konfigurasi sehingga tampak sebagai berikut
+```
+
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
         DocumentRoot /var/www/wise.b04.com
         ServerName wise.b04.com
         ServerAlias www.wise.b04.com
 
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
 
         <Directory /var/www/wise.b04.com>
                 Options +FollowSymLinks -Multiviews
                 AllowOverride All
         </Directory>
 </VirtualHost>
-" > /etc/apache2/sites-available/wise.b04.com.conf
+```
+- lakukan restart service `apache2` dengan menggunakan syntax berikut :
+```
 service apache2 restart
 ```
-
-### Soal 10
+untuk mengecek konfigurasi. pada node Client (SSS dan Garden) lakukan perintah sebagai berikut :
 ```
-echo "
-<VirtualHost *:80>
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/eden.wise.b04.com
-        ServerName eden.wise.b04.com
-        ServerAlias www.eden.wise.b04.com
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-        <Directory /var/www/wise.b04.com>
-                Options +FollowSymLinks -Multiviews
-                AllowOverride All
-        </Directory>
-</VirtualHost>
-" > /etc/apache2/sites-available/eden.wise.b04.com.conf
-a2ensite eden.wise.b04.com
-mkdir /var/www/eden.wise.b04.com
-cp -r /root/Praktikum-Modul-2-Jarkom/eden.wise/. /var/www/eden.wise.b04.com
-service apache2 restart
-echo "<?php echo 'yes nomor 10' ?>" > /var/www/eden.wise.b04.com/index.php
+lynx www.wise.b07.com/index.php/home
 ```
+konfigurasi dapat dikatakan benar jika keluaran sebagai berikut
+![9 1](https://user-images.githubusercontent.com/72547769/198892723-6f4ddf55-e9d0-46c0-a51c-607788a1a4da.png)
 
-### Soal 11
+### Soal 10, 11, 12, 13
+Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/eden.wise.yyy.com. Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja. Tidak hanya itu, Loid juga ingin menyiapkan error file 404.html pada folder /error untuk mengganti error kode pada apache. Loid juga meminta Franky untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.eden.wise.yyy.com/public/js menjadi www.eden.wise.yyy.com/js
+
+### Jawab
+
+Pada node eden lakukan perintah sebagai berikut :
+- edit file /etc/apache2/sites-available/eden.wise.b04.com.confdengan menggunakan perintah
 ```
-echo "
-<VirtualHost *:80>
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/eden.wise.b04.com
-        ServerName eden.wise.b04.com
-        ServerAlias www.eden.wise.b04.com
-
-        <Directory /var/www/eden.wise.b04.com/public>
-                Options +Indexes
-        </Directory>
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-        <Directory /var/www/wise.b04.com>
-                Options +FollowSymLinks -Multiviews
-                AllowOverride All
-        </Directory>
-</VirtualHost>
-" > /etc/apache2/sites-available/eden.wise.b04.com.conf
-service apache2 restart
+nano /etc/apache2/sites-available/eden.wise.b04.com.conf
 ```
-
-### Soal 12
+- sesuaikan konfigurasi sehingga tampak sebagai berikut
 ```
-echo "
-<VirtualHost *:80>
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/eden.wise.b04.com
-        ServerName eden.wise.b04.com
-        ServerAlias www.eden.wise.b04.com
-
-        ErrorDocument 404 /error/404.html
-        ErrorDocument 500 /error/404.html
-        ErrorDocument 502 /error/404.html
-        ErrorDocument 503 /error/404.html
-        ErrorDocument 504 /error/404.html
-
-        <Directory /var/www/eden.wise.b04.com/public>
-                Options +Indexes
-        </Directory>
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-        <Directory /var/www/wise.b04.com>
-                Options +FollowSymLinks -Multiviews
-                AllowOverride All
-        </Directory>
-</VirtualHost>
-" > /etc/apache2/sites-available/eden.wise.b04.com.conf
-service apache2 restart
-```
-
-### Soal 13
-```
-echo "
 <VirtualHost *:80>
 
         ServerAdmin webmaster@localhost
@@ -262,74 +518,42 @@ echo "
                 Options +Indexes
         </Directory>
 
-        Alias \"/js\" \"/var/www/eden.wise.b04.com/public/js\"
-
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
+        Alias "/js" "/var/www/eden.wise.b04.com/public/js"
+        <Directory /var/www/eden.wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
 
         <Directory /var/www/wise.b04.com>
                 Options +FollowSymLinks -Multiviews
                 AllowOverride All
         </Directory>
 </VirtualHost>
-" > /etc/apache2/sites-available/eden.wise.b04.com.conf
-service apache2 restart
 ```
+untuk mengecek konfigurasi, pada node client (SSS dan Garden) lakukan perintah sebagai berikut :
+
+- cek folder yang sudah dibuat, dengan menggunakan
+```
+cd /var/www/wise.b04.com/
+ls
+```
+- konfigurasi dapat dikatakan benar jika tampilan terlihat sebagai berikut :
+![10 1](https://user-images.githubusercontent.com/72547769/198893044-3d3666bc-2b75-4b22-b185-42868e68114c.png)
+
+- tampilan situs jika situs tidak ditemukan akan muncul sebagai berikut :
+![10 2](https://user-images.githubusercontent.com/72547769/198893135-0a372a6b-a40e-4b49-93f3-b800fd5e8e71.png)
 
 ### Soal 14
-```
-echo "
-<VirtualHost *:15000>
+Loid meminta agar www.strix.operation.wise.yyy.com hanya bisa diakses dengan port 15000 dan port 15500
 
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/strix.operation.wise.b04.com
-        ServerName strix.operation.wise.b04.com
-        ServerAlias www.strix.operation.wise.b04.com
+### Jawab
+pada eden buat config baru dengan `nano /etc/apache2/sites-available/strix.operation.wise.b04.com.conf`
+![14 1](https://user-images.githubusercontent.com/72547769/198893268-dfc3c6f6-7dc5-43aa-bc96-13158ba5c2da.png)
 
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-<VirtualHost *:15500>        
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/strix.operation.wise.b04.com
-        ServerName strix.operation.wise.b04.com
-        ServerAlias www.strix.operation.wise.b04.com
-        
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-" > /etc/apache2/sites-available/strix.operation.wise.b04.com.conf
-a2ensite strix.operation.wise.b04.com
-service apache2 restart
-mkdir /var/www/strix.operation.wise.b04.com
-cp -r /root/Praktikum-Modul-2-Jarkom/strix.operation.wise/ ./var/www/strix.operation.wise.b04.com/
-echo "
-<?php
-        echo 'selamat 14';
-?>
-" > /var/www/strix.operation.wise.b04.com/index.php
-echo "
-# If you just change the port or add more ports here, you will likely also
-# have to change the VirtualHost statement in
-# /etc/apache2/sites-enabled/000-default.conf
-
-Listen 80
-Listen 15000
-Listen 15500
-<IfModule ssl_module>
-        Listen 443
-</IfModule>
-
-<IfModule mod_gnutls.c>
-        Listen 443
-</IfModule>
-" > /etc/apache2/ports.conf
-
-service apache2 restart
-```
+kemudian aktifkan dengan `a2ensite strix.operation.wise.b04.com` kemudian edit juga pada `/etc/apache2/ports.conf` seperti berikut
+![14 2](https://user-images.githubusercontent.com/72547769/198893367-93b5ecb7-f781-4ff2-90ee-1b7e11523c90.png)
 
 ### Soal 15
 ```
