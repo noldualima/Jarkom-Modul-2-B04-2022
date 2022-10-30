@@ -11,6 +11,9 @@ NRP | Nama
 ## Soal Shift Modul 2
 Link : https://docs.google.com/document/d/11Mz2Fd3DKtGkCknHee9VZRdJYvZ3YAMIaifObHEpBFo/edit
 
+## Topologi
+file .gns3project dapat dilihat di link [berikut](https://github.com/noldualima/Jarkom-Modul-2-B04-2022/blob/main/Praktikum2.gns3project).
+
 ![messageImage_1666696807418](https://user-images.githubusercontent.com/91501217/197770142-e39e2b78-89a5-4ba0-b5c0-40472f52d442.jpg)
 
 WISE akan dijadikan sebagai DNS Master, Berlint akan dijadikan DNS Slave, dan Eden akan digunakan sebagai Web Server. Terdapat 2 Client yaitu SSS, dan Garden
