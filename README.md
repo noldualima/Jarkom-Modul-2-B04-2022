@@ -555,133 +555,77 @@ pada eden buat config baru dengan `nano /etc/apache2/sites-available/strix.opera
 kemudian aktifkan dengan `a2ensite strix.operation.wise.b04.com` kemudian edit juga pada `/etc/apache2/ports.conf` seperti berikut
 ![14 2](https://user-images.githubusercontent.com/72547769/198893367-93b5ecb7-f781-4ff2-90ee-1b7e11523c90.png)
 
+Kemudian tes dengan `lynx strix.operation.wise.b07.com:15000`
+![14 2 5](https://user-images.githubusercontent.com/72547769/198893948-1a028673-ed95-4cde-86b5-7a33d1326e98.png)
+
+![14 3](https://user-images.githubusercontent.com/72547769/198893690-d46ed532-04cb-4c02-881c-10aebc871c09.png)
+
 ### Soal 15
+dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy (15) dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com
+
+### Jawab
+
+Buat password di Eden untuk apache2 `htpasswd -c -b /etc/apache2/.htpasswd Twilight opStrix` dan tambahkan
 ```
-htpasswd -c -b /etc/apache2/.htpasswd Twilight opStrix
-
-echo "
-<VirtualHost *:15000>
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/strix.operation.wise.b04.com
-        ServerName strix.operation.wise.b04.com
-        ServerAlias www.strix.operation.wise.b04.com
-
-        <Directory \"/var/www/strix.operation.wise.b04.com\">
+<Directory \"/var/www/strix.operation.wise.b04.com\">
                 AuthType Basic
                 AuthName \"Restricted Content\"
                 AuthUserFile /etc/apache2/.htpasswd
                 Require valid-user
         </Directory>
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-<VirtualHost *:15500>        
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/strix.operation.wise.b04.com
-        ServerName strix.operation.wise.b04.com
-        ServerAlias www.strix.operation.wise.b04.com
-        
-        <Directory \"/var/www/strix.operation.wise.b04.com\">
-                AuthType Basic
-                AuthName \"Restricted Content\"
-                AuthUserFile /etc/apache2/.htpasswd
-                Require valid-user
-        </Directory>
-        
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-" > /etc/apache2/sites-available/strix.operation.wise.b04.com.conf
-service apache2 restart
 ```
+pada setiap host lalu test dengan `lynx strix.operation.wise.b04.com:15000` maka akan diminta memasukan username dan password
+![15 1](https://user-images.githubusercontent.com/72547769/198894059-f0b867bc-d1b8-4bb3-b090-cbd9dd9460c9.png)
+dan hasilnya seperti ini
+![15 2](https://user-images.githubusercontent.com/72547769/198894108-cd9784b5-a677-4007-a3f5-6b353306dd5a.png)
+
 
 ### Soal 16
+dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com
+
+### jawab
+pada `/etc/apache2/sites-available/000-default.conf`
 ```
-echo "
-<VirtualHost *:80>
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/html
-
-        RewriteEngine On
+	RewriteEngine On
         RewriteCond %{HTTP_HOST} !^wise.b04.com$
         RewriteRule /.* http://wise.b04.com/ [R]
-
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-</VirtualHost>
-" > /etc/apache2/sites-available/000-default.conf
-service apache2 restart
 ```
+lalu tes menggunakan Ip Eden lynx 10.5.3.3 Maka hasilnya
+![16 1](https://user-images.githubusercontent.com/72547769/198894324-81d92cf1-76eb-41db-ba45-6efd5eb38bd4.png)
+
 
 ### Soal 17
+Karena website www.eden.wise.yyy.com semakin banyak pengunjung dan banyak modifikasi sehingga banyak gambar-gambar yang random, maka Loid ingin mengubah request gambar yang memiliki substring “eden” akan diarahkan menuju eden.png. Bantulah Agent Twilight dan Organisasi WISE menjaga perdamaian!
+
+### Jawab
+
+Pada node Eden lakukan perintah sebagai berikut :
 ```
-echo "
+nano /var/www/eden.wise.b04.com/.htaccess
+```
+sesuaikan konfigurasi sehingga tampak sebagai berikut :
+```
 RewriteEngine On
 RewriteCond %{REQUEST_URI} !/public/images/eden.png
 RewriteRule /.* http://eden.wise.b04.com/public/images/eden.png [L]
-" > /var/www/eden.wise.b04.com/.htaccess
-
-echo "
-<VirtualHost *:80>
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/eden.wise.b04.com
-        ServerName eden.wise.b04.com
-        ServerAlias www.eden.wise.b04.com
-
-        ErrorDocument 404 /error/404.html
-        ErrorDocument 500 /error/404.html
-        ErrorDocument 502 /error/404.html
-        ErrorDocument 503 /error/404.html
-        ErrorDocument 504 /error/404.html
-
-        <Directory /var/www/eden.wise.b04.com/public>
-                Options +Indexes
-        </Directory>
-
-        Alias \"/js\" \"/var/www/eden.wise.b04.com/public/js\"
-
-        <Directory /var/www/eden.wise.b04.com>
-                Options +FollowSymLinks -Multiviews
-                AllowOverride All
-        </Directory>
-        ErrorLog \${APACHE_LOG_DIR}/error.log
-        CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-        <Directory /var/www/wise.b04.com>
-                Options +FollowSymLinks -Multiviews
-                AllowOverride All
-        </Directory>
-</VirtualHost>
-" > /etc/apache2/sites-available/eden.wise.b04.com.conf
-service apache2 restart
-
-}
-
-if [ $HOSTNAME == "Ostania" ]
-then
-    Ostania
-elif [ $HOSTNAME == "WISE" ]
-then
-    Wise
-elif [ $HOSTNAME == "Berlint" ]
-then
-    Berlint
-elif [ $HOSTNAME == "SSS" ]
-then
-    SSS
-elif [ $HOSTNAME == "Garden" ]
-then
-    Garden
-elif [ $HOSTNAME == "Eden" ]
-then
-    Eden
-fi
 ```
+lalu ganti config pada 
+```
+/etc/apache2/sites-available/eden.wise.b07.com.conf
+```
+dengan menambah `AllowOverride All` lalu jangan lupa `a2enmod rewrite` dan juga jangan lupa `restart apache`
+```
+<Directory /var/www/eden.wise.b04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+```
+![17 1](https://user-images.githubusercontent.com/72547769/198894573-c499098c-7117-4186-86a0-12c509dcc4cd.png)
+
+kemudian cek dengan
+```
+lynx www.eden.wise.b07.com/asedenash
+```
+![17 2](https://user-images.githubusercontent.com/72547769/198894866-f4eb3db5-0c7a-4b2f-a8cc-76757ca09649.png)
 
 ## Kendala
-
